@@ -6,16 +6,19 @@ class User < ApplicationRecord
 
     # Validação
     validates :role, presence: true, inclusion: { in: ROLES }
+    validates :name, presence: true
+    validates :email, presence: true, uniqueness: true
+    validates :phone, presence: true
     
     def admin?
         role == "admin"
     end
 
     def gerente?
-    role == "gerente"
+        role == "gerente"
     end
 
     def assistente?
-    role == "assistente"
+        role == "assistente"
     end
 end
