@@ -1,67 +1,61 @@
 class MessagesController < ApplicationController
     before_action :authenticate_sender!
+    before_action :set_chat
+    before_action :authorize_sender!
   
     def create
-      chat = Chat.find_by(id: params[:chat_id])
-      return render json: { error: "Chat não encontrado" }, status: :not_found unless chat
+      @message = @chat.messages.build(message_params)
+      @message.sender = current_sender
   
-      unless authorized_to_send?(chat)
-        return render json: { error: "Você não pode enviar mensagem nesse chat" }, status: :unauthorized
-      end
-  
-      message = Message.new(
-        chat: chat,
-        content: params[:content],
-        sender_type: sender_type,
-        sender_id: sender_id
-      )
-  
-      if message.save
-        render json: message, status: :created
+      if @message.save
+        render json: @message, status: :created
       else
-        render json: { errors: message.errors.full_messages }, status: :unprocessable_entity
+        render json: { errors: @message.errors.full_messages }, status: :unprocessable_entity
       end
     end
   
     private
   
-    # 🔐 Determina quem está autenticado: user ou client
     def authenticate_sender!
       unless current_user || current_client
-        render json: { error: "Usuário não autenticado" }, status: :unauthorized
+        render json: { error: 'Unauthorized' }, status: :unauthorized
       end
     end
   
-    def sender_type
-      return "User" if current_user
-      return "Client" if current_client
-      nil
+    def current_sender
+      current_user || current_client
     end
   
-    def sender_id
-      return current_user.id if current_user
-      return current_client.id if current_client
-      nil
+    def set_chat
+      @chat = Chat.find(params[:chat_id])
     end
   
-    # 🔒 Valida se esse sender pode escrever nesse chat
-    def authorized_to_send?(chat)
-        if sender_type == "Client"
-          # Cliente só pode enviar no próprio chat do tipo "cliente"
-          return chat.chat_type == "cliente" && chat.client_id == current_client.id
-      
-        elsif sender_type == "User"
-          user = current_user
-      
-          return true if user.admin? || user.gerente?
-      
-          if user.assistente?
-            # Assistente só pode enviar no chat de IA, e só se tiver acesso ao cliente
-            return chat.chat_type == "ia" && user.assigned_clients.exists?(id: chat.client_id)
-          end
+    def authorize_sender!
+      if current_client
+        unless @chat.client_id == current_client.id
+          render json: { error: 'Forbidden' }, status: :forbidden
         end
-      
-        false
-      end      
-end
+      elsif current_user
+        case current_user.role
+        when 'admin', 'gerente'
+          # acesso total
+          return
+        when 'assistente'
+          client_id = @chat.client_id
+          assigned = ClientAssignment.exists?(user_id: current_user.id, client_id: client_id)
+          unless assigned
+            render json: { error: 'Forbidden - not assigned to this client' }, status: :forbidden
+          end
+        else
+          render json: { error: 'Forbidden - invalid role' }, status: :forbidden
+        end
+      else
+        render json: { error: 'Unauthorized' }, status: :unauthorized
+      end
+    end
+  
+    def message_params
+      params.require(:message).permit(:content)
+    end
+  end
   

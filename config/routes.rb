@@ -18,8 +18,9 @@ Rails.application.routes.draw do
     get  "/me", to: "clients#show"
   end
 
-  # Mensagens
-  resources :messages, only: [:create]
+  resources :chats do
+    resources :messages, only: [:create]
+  end
 
   resources :client_assignments, only: [:create, :destroy]
 
