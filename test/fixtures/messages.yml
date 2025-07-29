@@ -1,0 +1,15 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  chat: one
+  sender_type: MyString
+  sender_id: 1
+  content: MyText
+  approved: false
+
+two:
+  chat: two
+  sender_type: MyString
+  sender_id: 1
+  content: MyText
+  approved: false
