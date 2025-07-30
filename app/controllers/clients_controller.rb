@@ -1,7 +1,5 @@
 class ClientsController < ApplicationController
     before_action :authorize_create_client, only: [:create]
-    before_action :authorize_client_request, only: [:show]
-    skip_before_action :authorize_request, only: [:show]
   
     def create
       client = Client.new(client_params)
@@ -20,7 +18,7 @@ class ClientsController < ApplicationController
     
 
     def show
-        render json: { name: @current_client.name, email: @current_client.email }
+      render json: { name: @current_client.name, email: @current_client.email }
     end
   
     private

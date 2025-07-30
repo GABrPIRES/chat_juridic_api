@@ -19,8 +19,8 @@ Rails.application.routes.draw do
   end
 
   resources :chats do
-    resources :messages, only: [:create]
-  end
+    resources :messages, only: [:create, :index]
+  end  
 
   resources :client_assignments, only: [:create, :destroy]
 

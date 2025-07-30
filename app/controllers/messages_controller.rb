@@ -4,6 +4,7 @@ class MessagesController < ApplicationController
     before_action :authorize_sender!
   
     def create
+        Rails.logger.debug(params.inspect)
       @message = @chat.messages.build(message_params)
       @message.sender = current_sender
   
@@ -13,6 +14,14 @@ class MessagesController < ApplicationController
         render json: { errors: @message.errors.full_messages }, status: :unprocessable_entity
       end
     end
+
+    def index
+        @chat = Chat.find(params[:chat_id])
+        authorize_view!
+      
+        messages = @chat.messages.order(:created_at)
+        render json: messages
+    end      
   
     private
   
@@ -53,6 +62,36 @@ class MessagesController < ApplicationController
         render json: { error: 'Unauthorized' }, status: :unauthorized
       end
     end
+
+    def authorize_view!
+        Rails.logger.debug("current_user: #{current_user&.role}")
+        Rails.logger.debug("current_client: #{current_client.inspect}")
+        if current_client
+            Rails.logger.debug(current_client.inspect)
+            Rails.logger.debug(@chat.client_id.inspect)
+            Rails.logger.debug(@chat.chat_type.inspect)
+            if @chat.client_id != current_client.id
+                render json: { error: "Acesso negado - outro cliente" }, status: :forbidden
+            elsif @chat.chat_type != "cliente"
+                render json: { error: "Acesso negado - chat exclusivo da IA" }, status: :forbidden
+            end                       
+        elsif current_user
+          case current_user.role
+          when "admin", "gerente"
+            # acesso liberado
+            return
+          when "assistente"
+            assigned = ClientAssignment.exists?(user_id: current_user.id, client_id: @chat.client_id)
+            unless assigned
+              render json: { error: "Acesso negado - cliente não atribuído" }, status: :forbidden
+            end
+          else
+            render json: { error: "Role inválida" }, status: :forbidden
+          end
+        else
+          render json: { error: "Não autenticado" }, status: :unauthorized
+        end
+    end      
   
     def message_params
       params.require(:message).permit(:content)
