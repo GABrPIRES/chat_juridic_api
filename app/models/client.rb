@@ -6,7 +6,7 @@ class Client < ApplicationRecord
     validates :phone, presence: true
 
     has_many :chats, dependent: :destroy
-    has_many :messages, through: :chat
+    has_many :messages, through: :chats
     has_many :client_assignments
     has_many :assigned_users, through: :client_assignments, source: :user
   end
