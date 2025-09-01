@@ -1,5 +1,7 @@
 # config/routes.rb
 Rails.application.routes.draw do
+  get "up" => "rails/health#show", as: :rails_health_check
+  
   scope :api do
     # Auth
     post "user/signup",   to: "users#create"
@@ -27,5 +29,7 @@ Rails.application.routes.draw do
     get    "user/client_assignments",          to: "user_client_assignments#index"
     post   "user/client_assignments",          to: "user_client_assignments#create"
     delete "user/client_assignments/:id",      to: "user_client_assignments#destroy", constraints: { id: /\d+/ }
+
+    mount ActionCable.server => '/cable'
   end
 end
