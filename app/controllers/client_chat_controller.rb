@@ -4,8 +4,12 @@ class ClientChatController < ApplicationController
   
     # GET /api/client/chat
     def show
-      msgs = @chat.messages.order(:created_at)
-      render json: msgs.as_json(only: %i[id chat_id content sender_type created_at]), status: :ok
+        msgs = @chat.messages.order(:created_at)
+        
+        render json: {
+        chat_id: @chat.id,
+        messages: msgs.as_json(only: %i[id chat_id content sender_type created_at])
+        }, status: :ok
     end
   
     # POST /api/client/chat

@@ -1,8 +1,10 @@
 development:
   adapter: async
+
 test:
   adapter: test
+
 production:
   adapter: redis
-  url: <%= ENV.fetch("REDIS_URL") %>
+  url: <%= ENV["REDIS_URL"] %>
   channel_prefix: chat_juridico_api_production
