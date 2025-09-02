@@ -12,6 +12,7 @@ Rails.application.routes.draw do
     # Me
     get  "user/me",   to: "users#show"
     get  "users",     to: "users#index"
+    delete "users/:id", to: "users#destroy", constraints: { id: /\d+/ }
     get  "client/me", to: "clients#show"
 
     patch "user/roles/:id", to: "user_roles#update", constraints: { id: /\d+/ }

@@ -1,7 +1,7 @@
 class UsersController < ApplicationController
     before_action :authorize_create_user, only: [:create]
-    before_action :require_user!, only: [:index, :show] # Protege a nova rota
-    before_action :require_admin!, only: [:index]      # Apenas admins podem listar todos os usuários
+    before_action :require_user!, only: [:index, :show, :destroy] # Protege a nova rota
+    before_action :require_admin!, only: [:index, :destroy]      # Apenas admins podem listar todos os usuários
 
     # GET /api/users
     def index
@@ -28,6 +28,21 @@ class UsersController < ApplicationController
         render json: { error: "Unauthorized" }, status: :unauthorized
       end
     end
+
+    def destroy
+      target_user = User.find(params[:id])
+  
+      # Regra de segurança: Admin não pode se auto-excluir nem excluir outro admin.
+      if current_user.id == target_user.id || target_user.admin?
+        return render json: { error: "Permissão negada para excluir este usuário" }, status: :forbidden
+      end
+  
+      target_user.destroy
+      head :no_content # Retorna uma resposta 204 No Content, indicando sucesso sem corpo.
+    
+    rescue ActiveRecord::RecordNotFound
+      render json: { error: "Usuário não encontrado" }, status: :not_found
+    end  
   
     private
 

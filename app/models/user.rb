@@ -1,8 +1,8 @@
 class User < ApplicationRecord
     has_secure_password
-    has_many :client_assignments
+    has_many :client_assignments, dependent: :destroy
     has_many :assigned_clients, through: :client_assignments, source: :client
-
+    
 
     # Lista de roles válidas
     ROLES = %w[admin gerente assistente].freeze
