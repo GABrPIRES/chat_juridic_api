@@ -10,8 +10,11 @@ Rails.application.routes.draw do
     post "client/login",  to: "client_sessions#create"
 
     # Me
-    get  "user/me",   to: "protected#index"
+    get  "user/me",   to: "users#show"
+    get  "users",     to: "users#index"
     get  "client/me", to: "clients#show"
+
+    patch "user/roles/:id", to: "user_roles#update", constraints: { id: /\d+/ }
 
     # Chat do cliente (Whats-like)
     get  "client/chat", to: "client_chat#show"
