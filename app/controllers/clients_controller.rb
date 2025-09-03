@@ -20,7 +20,7 @@ class ClientsController < ApplicationController
     
 
     def show
-      render json: { name: @current_client.name, email: @current_client.email }
+      render json: { name: @current_client.name, email: @current_client.email, status: @current_client.status }
     end
 
     def update_status

@@ -14,6 +14,10 @@ class ClientChatController < ApplicationController
   
     # POST /api/client/chat
     def create
+        unless current_client.active?
+            return render json: { error: "Sua conta está inativa. Não é possível enviar mensagens." }, status: :forbidden
+        end
+
       content = params.require(:message).permit(:content)[:content]
   
       msg = @chat.messages.create!(
