@@ -15,6 +15,7 @@ Rails.application.routes.draw do
     delete "users/:id", to: "users#destroy", constraints: { id: /\d+/ }
     get  "client/me", to: "clients#show"
 
+    patch "clients/:id/status", to: "clients#update_status", constraints: { id: /\d+/ }
     patch "user/roles/:id", to: "user_roles#update", constraints: { id: /\d+/ }
 
     # Chat do cliente (Whats-like)

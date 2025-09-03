@@ -1,5 +1,8 @@
 class Client < ApplicationRecord
     has_secure_password
+
+    STATUSES = %w[active inactive].freeze
+    validates :status, presence: true, inclusion: { in: STATUSES }
   
     validates :name, presence: true
     validates :email, presence: true, uniqueness: true
