@@ -18,6 +18,13 @@ Rails.application.routes.draw do
     patch "clients/:id/status", to: "clients#update_status", constraints: { id: /\d+/ }
     patch "user/roles/:id", to: "user_roles#update", constraints: { id: /\d+/ }
 
+    # Profile Management
+    get "profile", to: "profiles#show"     # <-- ADICIONE ESTA LINHA
+    patch "profile", to: "profiles#update"   # <-- ADICIONE ESTA LINHA
+
+    # User Management
+    get "users", to: "users#index"
+
     # Chat do cliente (Whats-like)
     get  "client/chat", to: "client_chat#show"
     post "client/chat", to: "client_chat#create"
