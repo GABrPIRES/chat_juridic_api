@@ -20,7 +20,15 @@ class UserClientsChatsController < ApplicationController
     def create
       client = find_visible_client!(params[:client_id])
       chat   = client.chats.find(params[:id])
-  
+        
+      if current_user.assistente? && chat.cliente?
+        assignment = ClientAssignment.find_by(user_id: current_user.id, client_id: client.id)
+
+        # Se não houver atribuição ou se a permissão for falsa, bloqueia.
+        unless assignment&.can_reply_to_client
+          return render json: { error: "Você não tem permissão para responder diretamente a este cliente." }, status: :forbidden
+        end
+      end
       # só permitimos content; o sender vem do backend
       content = params.require(:message).permit(:content)[:content]
   

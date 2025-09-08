@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_02_233534) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_08_002022) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -19,6 +19,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_02_233534) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "chat_type"
+    t.string "status", default: "pending_tree", null: false
     t.index ["client_id"], name: "index_chats_on_client_id"
   end
 
@@ -27,6 +28,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_02_233534) do
     t.bigint "client_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "can_reply_to_client", default: false, null: false
     t.index ["client_id"], name: "index_client_assignments_on_client_id"
     t.index ["user_id"], name: "index_client_assignments_on_user_id"
   end
@@ -39,6 +41,23 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_02_233534) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "status", default: "active", null: false
+  end
+
+  create_table "decision_tree_options", force: :cascade do |t|
+    t.string "content"
+    t.bigint "decision_tree_question_id", null: false
+    t.bigint "next_question_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["decision_tree_question_id"], name: "index_decision_tree_options_on_decision_tree_question_id"
+    t.index ["next_question_id"], name: "index_decision_tree_options_on_next_question_id"
+  end
+
+  create_table "decision_tree_questions", force: :cascade do |t|
+    t.text "content"
+    t.boolean "is_root"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "ia_bots", force: :cascade do |t|
@@ -72,5 +91,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_02_233534) do
   add_foreign_key "chats", "clients"
   add_foreign_key "client_assignments", "clients"
   add_foreign_key "client_assignments", "users"
+  add_foreign_key "decision_tree_options", "decision_tree_questions"
+  add_foreign_key "decision_tree_options", "decision_tree_questions", column: "next_question_id"
   add_foreign_key "messages", "chats"
 end

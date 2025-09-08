@@ -1,6 +1,6 @@
 class UserClientAssignmentsController < ApplicationController
     before_action :require_user!
-    before_action :require_admin_or_gerente!, only: [:create, :destroy]
+    before_action :require_admin_or_gerente!, only: [:create, :destroy, :toggle_reply]
   
     # GET /api/user/client_assignments
     # admin/gerente: lista todos
@@ -50,6 +50,20 @@ class UserClientAssignmentsController < ApplicationController
     rescue ActiveRecord::RecordNotFound
       render json: { error: "Assignment não encontrado" }, status: :not_found
     end
+
+     # PATCH /api/user/client_assignments/:id/toggle_reply
+     def toggle_reply
+        assignment = ClientAssignment.find(params[:id])
+        
+        # O '!' inverte o valor booleano atual (true vira false, false vira true)
+        if assignment.update(can_reply_to_client: !assignment.can_reply_to_client)
+          render json: assignment, status: :ok
+        else
+          render json: { errors: assignment.errors.full_messages }, status: :unprocessable_entity
+        end
+      rescue ActiveRecord::RecordNotFound
+        render json: { error: "Atribuição não encontrada" }, status: :not_found
+      end
   
     private
   

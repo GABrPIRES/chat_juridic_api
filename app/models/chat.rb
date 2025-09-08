@@ -2,6 +2,9 @@ class Chat < ApplicationRecord
   belongs_to :client
   has_many :messages, dependent: :destroy
 
+  STATUSES = %w[pending_tree ongoing closed].freeze
+  validates :status, presence: true, inclusion: { in: STATUSES }
+
   # Lista de tipos válidos
   TYPES = %w[cliente ia].freeze
 

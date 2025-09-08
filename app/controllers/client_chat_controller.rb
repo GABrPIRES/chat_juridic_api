@@ -8,6 +8,7 @@ class ClientChatController < ApplicationController
         
         render json: {
         chat_id: @chat.id,
+        status: @chat.status, # <-- ADICIONE ESTA LINHA
         messages: msgs.as_json(only: %i[id chat_id content sender_type created_at])
         }, status: :ok
     end

@@ -41,6 +41,15 @@ Rails.application.routes.draw do
     get    "user/client_assignments",          to: "user_client_assignments#index"
     post   "user/client_assignments",          to: "user_client_assignments#create"
     delete "user/client_assignments/:id",      to: "user_client_assignments#destroy", constraints: { id: /\d+/ }
+    patch  "user/client_assignments/:id/toggle_reply", to: "user_client_assignments#toggle_reply", constraints: { id: /\d+/ }
+   
+    # Decision Tree Management
+    get "decision_tree", to: "decision_tree#index"
+    get "decision_tree/root", to: "decision_tree#root"
+    get "decision_tree/questions/:id", to: "decision_tree#show_question"
+    post "decision_tree/questions", to: "decision_tree#create"
+    post "decision_tree/questions/:question_id/options", to: "decision_tree#create_option"
+    patch "decision_tree/options/:id", to: "decision_tree#update_option"
 
     mount ActionCable.server => '/cable'
   end
