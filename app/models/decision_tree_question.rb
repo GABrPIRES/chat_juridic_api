@@ -1,6 +1,5 @@
-class DecisionTreeOption < ApplicationRecord
-    belongs_to :decision_tree_question
-    belongs_to :next_question, class_name: 'DecisionTreeQuestion', optional: true
+class DecisionTreeQuestion < ApplicationRecord
+    has_many :options, class_name: 'DecisionTreeOption', foreign_key: 'decision_tree_question_id', dependent: :destroy
   
     validates :content, presence: true
   end

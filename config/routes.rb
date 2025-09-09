@@ -28,6 +28,7 @@ Rails.application.routes.draw do
     # Chat do cliente (Whats-like)
     get  "client/chat", to: "client_chat#show"
     post "client/chat", to: "client_chat#create"
+    post "client/chat/submit_tree", to: "client_chat#submit_tree"
 
     get "user/clients/chats",             to: "user_clients_chats#index"      # <= específica primeiro
     get "user/clients/:client_id/chats",  to: "user_clients_chats#index"      # <= específica
